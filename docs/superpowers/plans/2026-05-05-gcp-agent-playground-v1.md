@@ -11,7 +11,7 @@
 **Source spec:** `docs/superpowers/specs/2026-05-05-gcp-agent-playground-design.md`
 
 **Working assumptions for the executor:**
-- Working directory is the root of the `gemma-play-1` repo.
+- Working directory is the root of the `local-model-playground` repo.
 - You are on the heavy MacBook profile (M5 Max, 128 GB).
 - Commits go to `main` directly (this is a fresh POC repo; no feature branch needed unless the user requests one).
 - Tests are smoke-only by design (per spec §1) — do **not** add per-module unit tests.

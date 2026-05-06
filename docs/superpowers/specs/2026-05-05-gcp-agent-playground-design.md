@@ -25,7 +25,7 @@ The brief is a POC playground for local Apple-Silicon models advising on synthet
 | ------------------------- | ----------------------------------------------------------------------------------------------- |
 | Dev hardware              | Heavy MacBook (M5 Max, 128 GB)                                                                  |
 | Server lifecycle          | CLI manages it — `gcp-agent` spawns `mlx_lm.server` per invocation, waits for ready, stops on exit |
-| Repo placement            | At the root of `gemma-play-1/` (this repo *is* the project)                                     |
+| Repo placement            | At the root of `local-model-playground/` (this repo *is* the project)                           |
 | Tests                     | Smoke-only — one gated end-to-end test plus a manual checklist                                  |
 | Model URI                 | Treat as TBD — v1 setup includes a "discover correct slug on `mlx-community`" step              |
 | CLI framework             | `typer`                                                                                         |
@@ -63,7 +63,7 @@ The brief is a POC playground for local Apple-Silicon models advising on synthet
 ## 3. Repo layout
 
 ```
-gemma-play-1/
+local-model-playground/
 ├── pyproject.toml              # uv-managed; declares gcp-agent script entry
 ├── README.md                   # rewritten quickstart
 ├── docs/

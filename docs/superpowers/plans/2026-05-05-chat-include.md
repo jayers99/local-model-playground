@@ -11,7 +11,7 @@
 **Source spec:** `docs/superpowers/specs/2026-05-05-chat-include-design.md`
 
 **Working assumptions for the executor:**
-- Working directory is the repo root (`/Users/jayers/code/gemma-play-1`).
+- Working directory is the repo root (`/Users/jayers/code/local-model-playground`).
 - `uv sync` has already been run (so `pytest` is available via `uv run pytest`).
 - Commits go to `main` directly (continuing the v1 convention).
 - Each task ends with one commit. Use brief single-line commit messages focused on *why*.
