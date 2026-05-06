@@ -6,21 +6,23 @@ For the deferred-hardening register (corporate data handling, audit trail, redac
 
 ## Model roster
 
-Reference table for the profile work below. RAM tiers are rough working-set estimates for the listed server binary; add headroom for OS + other apps. The gemma-4 variants ship multimodal-shaped weights so they need `mlx_vlm.server`; GLM-4.5-Air and Qwen3-Coder are text-only and use `mlx_lm.server`.
+All six profiles tested 2026-05-05 (boot + single-turn generation). RAM tiers are rough working-set estimates; add headroom for OS + other apps. The gemma-4 variants ship multimodal-shaped weights so they need `mlx_vlm.server`; GLM-4.5-Air and Qwen3-Coder are text-only and use `mlx_lm.server`.
 
-| Profile  | Model slug                                            | Server           | Params (active)          | MacBook RAM    | Purpose                                                                                                  |
-| -------- | ----------------------------------------------------- | ---------------- | ------------------------ | -------------- | -------------------------------------------------------------------------------------------------------- |
-| light    | `mlx-community/gemma-4-e4b-it-4bit`                   | `mlx_vlm.server` | ~4B                      | 16 GB+         | Fast iteration, concept explanation, small Terraform review.                                             |
-| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`               | `mlx_vlm.server` | 26B total / ~4B active   | 36–64 GB       | MoE — 4B-class compute speed with 26B-breadth knowledge. Middle tier when latency matters more than depth.|
-| code     | `mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`     | `mlx_lm.server`  | 30B total / 3B active    | 36–64 GB       | Coding-specialized MoE — code review, scaffolding, refactor advice.                                      |
-| heavy    | `mlx-community/gemma-4-31b-it-4bit`                   | `mlx_vlm.server` | 31B                      | 64–128 GB      | Default deep-synthesis tier — Terraform review, GCP reasoning. Currently in `profiles/heavy.yaml`.       |
-| arch     | `mlx-community/GLM-4.5-Air-4bit`                      | `mlx_lm.server`  | 106B total / 12B active  | 96–128 GB      | Architecture / design reasoning — GCP solution shape, trade-offs, system decomposition.                  |
-| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`                   | `mlx_vlm.server` | 31B                      | 128 GB (tight) | Same 31B as heavy at 8-bit for max-fidelity local synthesis. Slowest tokens/sec, biggest cold-start.     |
+Cold-start column = `listener_ready_s + first_token_s` from `scripts/bench_cold_start.py` on a 128 GB M5 Max with **OS page cache hot** (model files recently read). True cold-after-reboot will be higher, especially for arch (57 GB on disk).
+
+| Profile  | Model slug                                            | Server           | Params (active)          | MacBook RAM    | Cold start | Purpose                                                                                                  |
+| -------- | ----------------------------------------------------- | ---------------- | ------------------------ | -------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
+| light    | `mlx-community/gemma-4-e4b-it-4bit`                   | `mlx_vlm.server` | ~4B                      | 16 GB+         | ~2.9 s     | Fast iteration, concept explanation, small Terraform review.                                             |
+| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`               | `mlx_vlm.server` | 26B total / ~4B active   | 36–64 GB       | ~3.5 s     | MoE — 4B-class compute speed with 26B-breadth knowledge. Middle tier when latency matters more than depth.|
+| code     | `mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`     | `mlx_lm.server`  | 30B total / 3B active    | 36–64 GB       | ~2.5 s     | Coding-specialized MoE — code review, scaffolding, refactor advice.                                      |
+| heavy    | `mlx-community/gemma-4-31b-it-4bit`                   | `mlx_vlm.server` | 31B                      | 64–128 GB      | ~4.2 s     | Default deep-synthesis tier — Terraform review, GCP reasoning. Currently in `profiles/heavy.yaml`.       |
+| arch     | `mlx-community/GLM-4.5-Air-4bit`                      | `mlx_lm.server`  | 106B total / 12B active  | 96–128 GB      | ~11.8 s    | Architecture / design reasoning — GCP solution shape, trade-offs, system decomposition.                  |
+| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`                   | `mlx_vlm.server` | 31B                      | 128 GB (tight) | ~5.4 s     | Same 31B as heavy at 8-bit for max-fidelity local synthesis. Highest weight count once page cache is cold.|
 
 ## v1 close-out (priority:high)
 
 - [ ] Capture live-walk observations in `notes/lessons-learned.md`:
-  - Heavy-profile cold-start time (server `/v1/models` 200 → first token of an actual response)
+  - [x] Heavy-profile cold-start time (server `/v1/models` 200 → first token of an actual response) — captured for all six profiles in the cold-start section of `notes/lessons-learned.md`. Heavy: 0.6 s first-token on a hot page cache.
   - Quality of the review of `service-account-bad-editor.tf` (does it find `roles/editor`? validation evidence reasonable? open questions sensible?)
   - The "haywire on long paste in `chat`" observation — what happened, how long the pasted content was
   - Any flag/CLI shape mismatches we worked around

@@ -34,6 +34,30 @@ Workflow change forced by Gemma's chat template:
 
 - Gemma's tokenizer chat template raises `'System role not supported'` if `messages[0].role == 'system'`. `workflows.py` was updated to merge the system prompt into the first user message (`_prepend_system`). This is permanent; Gemma 2/3/4 all share that constraint.
 
+## Cold-start measurements (2026-05-05, M5 Max 128 GB, page cache hot)
+
+Run via `uv run python scripts/bench_cold_start.py <profile>`, which times three phases against `time.monotonic()`:
+
+- `listener_ready_s` — process start until `/v1/models` returns 200 (HTTP listener up)
+- `first_token_s` — listener-ready until the first streamed chunk arrives (lazy model load + prefill of system prompt + first token)
+- `full_response_s` — listener-ready until the response stream ends
+
+| Profile | listener_ready | first_token | full_response | server binary    |
+| ------- | -------------- | ----------- | ------------- | ---------------- |
+| light   | 2.6 s          | 0.3 s       | 0.4 s         | `mlx_vlm.server` |
+| wide    | 3.1 s          | 0.4 s       | 0.5 s         | `mlx_vlm.server` |
+| code    | 0.5 s          | 2.0 s       | 2.2 s         | `mlx_lm.server`  |
+| heavy   | 3.6 s          | 0.6 s       | 1.4 s         | `mlx_vlm.server` |
+| x-heavy | 4.6 s          | 0.8 s       | 2.3 s         | `mlx_vlm.server` |
+| arch    | 1.1 s          | 10.7 s      | 12.3 s        | `mlx_lm.server`  |
+
+Two findings:
+
+1. **`mlx_vlm.server` has a noticeably heavier import.** Listener-ready is consistently 2.6–4.6 s on the four `mlx_vlm.server` profiles vs. 0.5–1.1 s on the two `mlx_lm.server` profiles. Most of the time `gcp-agent` looks "stuck" before the model loads, it's actually mlx_vlm pulling in vision-tower modules. Heavy uses mlx_vlm because gemma-4 is multimodal-shaped, but text-only profiles boot the listener ~3 s faster.
+2. **arch (GLM-4.5-Air, 57 GB on disk) is the only profile where first-token cost is meaningful at hot cache** — 10.7 s. The smaller gemma-4 variants stay sub-second because the file pages are already mapped and the model is small enough that load + prefill happens almost instantly. Truly cold-after-reboot numbers will be much larger for any profile bigger than ~30 GB; budget for it before claiming arch/x-heavy are usable interactively.
+
+Caveat: these are warm-disk, cold-process numbers. To reproduce a true cold start, run `sudo purge` (drops macOS file cache) before each invocation.
+
 ## Manual checklist (post-v1 features)
 
 - [ ] `chat --include`: run `gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.
