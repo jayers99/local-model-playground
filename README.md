@@ -20,6 +20,10 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 
        uv run gcp-agent chat --profile heavy
 
+   To put a file in front of the model up front (avoids the long-paste pitfall), use `--include`:
+
+       uv run gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf
+
 4. Review the bundled example:
 
        uv run gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf

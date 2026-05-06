@@ -102,3 +102,42 @@ def test_load_include_exits_on_non_utf8(
     err = capsys.readouterr().err
     assert "Could not read" in err
     assert "as UTF-8 text" in err
+
+
+def test_chat_only_prepends_include_on_first_turn(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The include is folded into turn 1's user message; turn 2 is bare user text."""
+    from gcp_agent_playground import workflows
+
+    monkeypatch.setattr(workflows, "_system_prompt", lambda: "SYS")
+
+    include_file = tmp_path / "tiny.tf"
+    include_file.write_text('resource "x" {}\n')
+
+    inputs = iter(["first question", "second question", "exit"])
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
+
+    seen_messages: list[list[dict]] = []
+
+    class FakeClient:
+        profile = None
+
+        def stream_chat(self, messages: list[dict]):
+            seen_messages.append([dict(m) for m in messages])
+            yield "ok"
+
+    workflows.chat(FakeClient(), include_path=include_file)
+
+    assert len(seen_messages) == 2
+
+    turn1 = seen_messages[0]
+    assert len(turn1) == 1
+    assert "--- BEGIN INCLUDED FILE:" in turn1[0]["content"]
+    assert "first question" in turn1[0]["content"]
+
+    turn2 = seen_messages[1]
+    assert turn2[-1]["role"] == "user"
+    assert "--- BEGIN INCLUDED FILE:" not in turn2[-1]["content"]
+    assert turn2[-1]["content"] == "second question"
