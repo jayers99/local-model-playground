@@ -74,7 +74,7 @@ def _load_include_or_exit(include_path: Path | None) -> str | None:
     if include_path is None:
         return None
     try:
-        body = include_path.read_text()
+        body = include_path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         print(
             f"Could not read {include_path} as UTF-8 text. "
