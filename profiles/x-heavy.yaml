@@ -1,0 +1,13 @@
+name: x-heavy
+description: "128 GB MacBook profile — same 31B as heavy, 8-bit for max fidelity"
+runtime: mlx
+model: mlx-community/gemma-4-31b-it-8bit
+server_binary: mlx_vlm.server
+host: 127.0.0.1
+port: 8080
+base_url: http://127.0.0.1:8080/v1
+temperature: 0.3
+max_tokens: 4000
+intended_use:
+  - max-fidelity local synthesis
+  - deepest Terraform review and GCP reasoning when tokens/sec is not the bottleneck

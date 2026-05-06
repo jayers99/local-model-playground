@@ -1,0 +1,13 @@
+name: wide
+description: "36–64 GB MacBook profile — MoE for breadth at low compute cost"
+runtime: mlx
+model: mlx-community/gemma-4-26b-a4b-it-4bit
+server_binary: mlx_vlm.server
+host: 127.0.0.1
+port: 8080
+base_url: http://127.0.0.1:8080/v1
+temperature: 0.3
+max_tokens: 3000
+intended_use:
+  - middle-tier Terraform review when latency matters more than depth
+  - knowledge-breadth questions at 4B-class compute speed
