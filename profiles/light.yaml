@@ -2,7 +2,7 @@ name: light
 description: "16 GB+ MacBook profile for fast local iteration"
 runtime: mlx
 model: mlx-community/gemma-4-e4b-it-4bit
-server_binary: mlx_lm.server
+server_binary: mlx_vlm.server
 host: 127.0.0.1
 port: 8080
 base_url: http://127.0.0.1:8080/v1

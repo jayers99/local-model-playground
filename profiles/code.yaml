@@ -1,0 +1,14 @@
+name: code
+description: "36–64 GB MacBook profile — Qwen3-Coder MoE for coding tasks"
+runtime: mlx
+model: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit
+server_binary: mlx_lm.server
+host: 127.0.0.1
+port: 8080
+base_url: http://127.0.0.1:8080/v1
+temperature: 0.2
+max_tokens: 4000
+intended_use:
+  - code review
+  - scaffolding and refactor advice
+  - small-to-medium coding tasks

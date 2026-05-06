@@ -4,16 +4,18 @@ Forward work for `gcp-agent-playground` after v1. Use checkboxes; mark items don
 
 For the deferred-hardening register (corporate data handling, audit trail, redaction, etc.), see `notes/future-hardening.md` instead — that file is the long-tail security/compliance ledger; this file is the active feature queue.
 
-## Model roster (gemma-4 family)
+## Model roster
 
-Reference table for the profile work below. RAM tiers are rough working-set estimates for `mlx_vlm.server` (multimodal eats more KV cache than text-only `mlx_lm`); add headroom for OS + other apps.
+Reference table for the profile work below. RAM tiers are rough working-set estimates for the listed server binary; add headroom for OS + other apps. The gemma-4 variants ship multimodal-shaped weights so they need `mlx_vlm.server`; GLM-4.5-Air and Qwen3-Coder are text-only and use `mlx_lm.server`.
 
-| Profile  | Model slug                                  | Params (active)        | MacBook RAM   | Purpose                                                                          |
-| -------- | ------------------------------------------- | ---------------------- | ------------- | -------------------------------------------------------------------------------- |
-| light    | `mlx-community/gemma-4-e4b-it-4bit`         | ~4B                    | 16 GB+        | Fast iteration, concept explanation, small Terraform review.                     |
-| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`     | 26B total / ~4B active | 36–64 GB      | MoE: 4B-class compute speed with 26B-breadth knowledge. Middle tier when latency matters more than depth. |
-| heavy    | `mlx-community/gemma-4-31b-it-4bit`         | 31B                    | 64–128 GB     | Default deep-synthesis tier — Terraform review, GCP reasoning. Currently in `profiles/heavy.yaml`. |
-| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`         | 31B                    | 128 GB (tight)| Same 31B at 8-bit for max-fidelity local synthesis. Slower tokens/sec, biggest cold-start. |
+| Profile  | Model slug                                            | Server           | Params (active)          | MacBook RAM    | Purpose                                                                                                  |
+| -------- | ----------------------------------------------------- | ---------------- | ------------------------ | -------------- | -------------------------------------------------------------------------------------------------------- |
+| light    | `mlx-community/gemma-4-e4b-it-4bit`                   | `mlx_vlm.server` | ~4B                      | 16 GB+         | Fast iteration, concept explanation, small Terraform review.                                             |
+| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`               | `mlx_vlm.server` | 26B total / ~4B active   | 36–64 GB       | MoE — 4B-class compute speed with 26B-breadth knowledge. Middle tier when latency matters more than depth.|
+| code     | `mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`     | `mlx_lm.server`  | 30B total / 3B active    | 36–64 GB       | Coding-specialized MoE — code review, scaffolding, refactor advice.                                      |
+| heavy    | `mlx-community/gemma-4-31b-it-4bit`                   | `mlx_vlm.server` | 31B                      | 64–128 GB      | Default deep-synthesis tier — Terraform review, GCP reasoning. Currently in `profiles/heavy.yaml`.       |
+| arch     | `mlx-community/GLM-4.5-Air-4bit`                      | `mlx_lm.server`  | 106B total / 12B active  | 96–128 GB      | Architecture / design reasoning — GCP solution shape, trade-offs, system decomposition.                  |
+| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`                   | `mlx_vlm.server` | 31B                      | 128 GB (tight) | Same 31B as heavy at 8-bit for max-fidelity local synthesis. Slowest tokens/sec, biggest cold-start.     |
 
 ## v1 close-out (priority:high)
 
@@ -29,7 +31,7 @@ Reference table for the profile work below. RAM tiers are rough working-set esti
 ### priority:high
 
 - [ ] **`compare` command.** Run two profiles against the same input, emit a side-by-side `outputs/<ts>-comparison.md` (and a metadata header with both model slugs). Most directly tests the brief's thesis (small-vs-large local model behavior). Heavy is `mlx-community/gemma-4-31b-it-4bit` (in use); pair it with a light tier for fast iteration and an x-heavy tier for max-fidelity runs.
-  - Sub-task: define a second working profile (light) — `mlx-community/gemma-4-e4b-it-4bit` (~2B "Edge 4B" variant, comfortably fits a 36 GB MacBook), validate it boots, store the slug in `profiles/light.yaml`.
+  - [x] Sub-task: define a second working profile (light) — `mlx-community/gemma-4-e4b-it-4bit` (~2B "Edge 4B" variant, comfortably fits a 36 GB MacBook), validated boot + single-turn generation 2026-05-05. Note: e4b ships multimodal-shaped weights, so light uses `mlx_vlm.server` (text-only `mlx_lm.server` loads the listener but crashes on first generation).
   - Sub-task: define an x-heavy profile — `mlx-community/gemma-4-31b-it-8bit` (same 31B model at 8-bit for higher-fidelity local synthesis; gemma-4 tops out at 31B params, so the next tier up is precision, not size). Store in `profiles/x-heavy.yaml`. Expect bigger RAM footprint and slower tokens/sec than heavy.
   - Sub-task: serialize: stop heavy server → start light server → run → stop → optional restart heavy. Or: use distinct ports to run both concurrently if RAM allows.
 - [x] **`chat --include <path>`** flag. Read a file, prepend it (with a clear delimiter) to the first user message of the REPL session. Closes the "I tried to paste a file and it went haywire" gap directly.

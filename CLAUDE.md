@@ -42,23 +42,26 @@ Key invariants:
 
 - **Server lifecycle is bound to one CLI invocation.** Every command cold-starts the model server, runs, then stops. There is no daemon mode (yet — see `docs/backlog.md`). Cold-start time on heavy is the dominant UX cost.
 - **Profiles are the single configuration surface.** Model slug, server binary (`mlx_lm.server` for text-only, `mlx_vlm.server` for multimodal), port, temperature, and max_tokens all live in `profiles/<name>.yaml`. The pydantic schema is in `src/gcp_agent_playground/profiles.py`.
+- **gemma-4 weights are multimodal-shaped** (checkpoint tensors prefixed with `language_model.`), so every gemma-4 profile needs `mlx_vlm.server`. `mlx_lm.server` boots the HTTP listener fine but crashes the loader thread on first generation with `ValueError: Received N parameters not in model: language_model.model.layers...`. If you add a new gemma profile and generation hangs after `agent> `, this is almost certainly the cause — check the latest `outputs/.server-logs/*.log`. Non-gemma text-only models (GLM-4.5-Air, Qwen3-Coder) use `mlx_lm.server` instead.
 - **All profiles share port 8080**, so you can only run one at a time. The `compare` command in the backlog will need to either serialize (stop heavy → start light) or assign distinct ports.
 - **Gemma's chat template rejects the `system` role.** `mlx_lm.server` returns 404 `{"error": "System role not supported"}` if you send one. `workflows._prepend_system` works around this by merging `prompts/system.md` into the first user message. Don't add a system role anywhere — re-use that helper.
 - **`--include` content is wrapped with explicit `BEGIN/END INCLUDED FILE` delimiters** before being prepended to the first user turn. See `workflows._build_first_user_message`. Encoding errors exit with code 2; large files (>64 KB) print a warning but don't block.
 - **Working directory matters.** `prompts/`, `profiles/`, and `outputs/` are resolved relative to CWD, not the package install path. CLI must be invoked from the repo root. (Tracked as a low-priority backlog item.)
 
-## Profile roster (gemma-4)
+## Profile roster
 
-`docs/backlog.md` has the canonical model roster table. Quick reference:
+`docs/backlog.md` has the canonical roster with full model slugs and purpose notes. Quick reference:
 
-| Profile  | Model                                       | RAM tier      |
-| -------- | ------------------------------------------- | ------------- |
-| light    | `mlx-community/gemma-4-e4b-it-4bit`         | 16 GB+        |
-| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`     | 36–64 GB      |
-| heavy    | `mlx-community/gemma-4-31b-it-4bit`         | 64–128 GB     |
-| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`         | 128 GB (tight)|
+| Profile  | Family       | Server           | RAM tier       | Domain                       |
+| -------- | ------------ | ---------------- | -------------- | ---------------------------- |
+| light    | gemma-4 e4b  | `mlx_vlm.server` | 16 GB+         | fast iteration               |
+| wide     | gemma-4 26B MoE | `mlx_vlm.server` | 36–64 GB    | breadth at low compute cost  |
+| code     | Qwen3-Coder 30B MoE | `mlx_lm.server` | 36–64 GB | coding                       |
+| heavy    | gemma-4 31B  | `mlx_vlm.server` | 64–128 GB      | default deep synthesis (CLI default) |
+| arch     | GLM-4.5-Air 106B MoE | `mlx_lm.server` | 96–128 GB | architecture / design reasoning |
+| x-heavy  | gemma-4 31B 8-bit | `mlx_vlm.server` | 128 GB (tight) | max-fidelity synthesis  |
 
-Heavy is the default in CLI commands. Light, wide, and x-heavy haven't been validated end-to-end yet.
+Validated end-to-end: heavy, light. Others boot-tested only or unvalidated — confirm before relying on them.
 
 ## Where things live
 

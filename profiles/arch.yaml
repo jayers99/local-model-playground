@@ -1,0 +1,14 @@
+name: arch
+description: "96–128 GB MacBook profile — GLM-4.5-Air MoE for architecture/design reasoning"
+runtime: mlx
+model: mlx-community/GLM-4.5-Air-4bit
+server_binary: mlx_lm.server
+host: 127.0.0.1
+port: 8080
+base_url: http://127.0.0.1:8080/v1
+temperature: 0.3
+max_tokens: 4000
+intended_use:
+  - GCP solution architecture and trade-off analysis
+  - system decomposition and design review
+  - acceptance-criteria reasoning over multi-component designs
