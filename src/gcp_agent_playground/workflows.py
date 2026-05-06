@@ -49,6 +49,20 @@ def _build_first_user_message(
     )
 
 
+def _human_size(n: int) -> str:
+    """Format a byte count as a short human-readable string.
+
+    < 1 KiB  -> "<n> B"      (no decimals)
+    < 1 MiB  -> "<n/1024:.1f> KB"
+    >= 1 MiB -> "<n/1024**2:.1f> MB"
+    """
+    if n < 1024:
+        return f"{n} B"
+    if n < 1024 * 1024:
+        return f"{n / 1024:.1f} KB"
+    return f"{n / (1024 * 1024):.1f} MB"
+
+
 def chat(client: LLMClient) -> None:
     """Interactive REPL. Read a user line, stream the assistant reply, repeat.
 

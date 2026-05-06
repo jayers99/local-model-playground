@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gcp_agent_playground.workflows import _build_first_user_message
+from gcp_agent_playground.workflows import _build_first_user_message, _human_size
 
 
 def test_build_first_user_message_no_include() -> None:
@@ -34,3 +34,20 @@ def test_build_first_user_message_preserves_path_string(tmp_path: Path) -> None:
     out_abs = _build_first_user_message("u", abs_p, "x")
     assert "BEGIN INCLUDED FILE: a/b.tf" in out_rel
     assert f"BEGIN INCLUDED FILE: {abs_p}" in out_abs
+
+
+def test_human_size_bytes() -> None:
+    assert _human_size(0) == "0 B"
+    assert _human_size(412) == "412 B"
+    assert _human_size(1023) == "1023 B"
+
+
+def test_human_size_kilobytes() -> None:
+    assert _human_size(1024) == "1.0 KB"
+    assert _human_size(64 * 1024) == "64.0 KB"
+    assert _human_size(int(128.4 * 1024)) == "128.4 KB"
+
+
+def test_human_size_megabytes() -> None:
+    assert _human_size(1024 * 1024) == "1.0 MB"
+    assert _human_size(int(2.3 * 1024 * 1024)) == "2.3 MB"
