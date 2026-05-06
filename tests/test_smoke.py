@@ -52,3 +52,30 @@ def test_review_end_to_end() -> None:
     assert "roles/editor" in findings_section, (
         f"Expected 'roles/editor' to appear in the Findings section. Got:\n{findings_section}"
     )
+
+
+@pytest.mark.skipif(not LIVE, reason="set RUN_LIVE=1 to run; needs a local MLX model")
+def test_chat_include_end_to_end() -> None:
+    result = subprocess.run(
+        [
+            "uv", "run", "gcp-agent", "chat",
+            "--profile", "heavy",
+            "--include", str(EXAMPLE),
+        ],
+        input="what's wrong with this?\nexit\n",
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+
+    assert result.returncode == 0, (
+        f"gcp-agent chat exited {result.returncode}\n"
+        f"STDOUT:\n{result.stdout}\n"
+        f"STDERR:\n{result.stderr}\n"
+    )
+
+    assert "roles/editor" in result.stdout.lower(), (
+        "Expected the model's reply to mention 'roles/editor', proving the "
+        "included file actually reached the model.\n"
+        f"STDOUT:\n{result.stdout}"
+    )
