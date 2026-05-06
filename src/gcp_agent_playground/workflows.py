@@ -82,7 +82,7 @@ def _load_include_or_exit(include_path: Path | None) -> str | None:
             file=sys.stderr,
         )
         sys.exit(2)
-    size = include_path.stat().st_size
+    size = len(body.encode("utf-8"))
     print(
         f"Loaded {include_path} ({_human_size(size)}) — "
         f"included with your first message."
