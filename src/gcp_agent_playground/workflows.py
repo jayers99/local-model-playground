@@ -7,6 +7,8 @@ from pathlib import Path
 from . import render
 from .llm_client import LLMClient
 
+INCLUDE_SIZE_WARN_BYTES = 64 * 1024
+
 PROMPTS_DIR = Path("prompts")
 
 
@@ -61,6 +63,36 @@ def _human_size(n: int) -> str:
     if n < 1024 * 1024:
         return f"{n / 1024:.1f} KB"
     return f"{n / (1024 * 1024):.1f} MB"
+
+
+def _load_include_or_exit(include_path: Path | None) -> str | None:
+    """Read the include file, print the echo (and warning if large).
+
+    Returns the file body, or None when no path was given.
+    On UnicodeDecodeError: prints to stderr and sys.exit(2).
+    """
+    if include_path is None:
+        return None
+    try:
+        body = include_path.read_text()
+    except UnicodeDecodeError:
+        print(
+            f"Could not read {include_path} as UTF-8 text. "
+            f"Includes must be text files.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    size = include_path.stat().st_size
+    print(
+        f"Loaded {include_path} ({_human_size(size)}) — "
+        f"included with your first message."
+    )
+    if size > INCLUDE_SIZE_WARN_BYTES:
+        print(
+            f"Warning: {include_path} is {_human_size(size)} — "
+            f"large includes may exceed the model's context window."
+        )
+    return body
 
 
 def chat(client: LLMClient) -> None:

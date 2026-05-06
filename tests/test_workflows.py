@@ -3,7 +3,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gcp_agent_playground.workflows import _build_first_user_message, _human_size
+import pytest
+
+from gcp_agent_playground.workflows import (
+    INCLUDE_SIZE_WARN_BYTES,
+    _build_first_user_message,
+    _human_size,
+    _load_include_or_exit,
+)
 
 
 def test_build_first_user_message_no_include() -> None:
@@ -52,3 +59,46 @@ def test_human_size_kilobytes() -> None:
 def test_human_size_megabytes() -> None:
     assert _human_size(1024 * 1024) == "1.0 MB"
     assert _human_size(int(2.3 * 1024 * 1024)) == "2.3 MB"
+
+
+def test_load_include_returns_none_when_path_is_none() -> None:
+    assert _load_include_or_exit(None) is None
+
+
+def test_load_include_reads_file_and_prints_echo(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    p = tmp_path / "small.tf"
+    p.write_text('resource "x" {}\n')
+    body = _load_include_or_exit(p)
+    assert body == 'resource "x" {}\n'
+    out = capsys.readouterr().out
+    assert f"Loaded {p}" in out
+    assert "included with your first message." in out
+    assert "Warning:" not in out
+
+
+def test_load_include_warns_on_large_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    p = tmp_path / "big.tf"
+    p.write_text("x" * (INCLUDE_SIZE_WARN_BYTES + 1))
+    body = _load_include_or_exit(p)
+    assert body is not None
+    out = capsys.readouterr().out
+    assert "Loaded" in out
+    assert "Warning:" in out
+    assert "may exceed the model's context window" in out
+
+
+def test_load_include_exits_on_non_utf8(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    p = tmp_path / "binary.bin"
+    p.write_bytes(b"\xff\xfe\x00\x01\x02\x03")
+    with pytest.raises(SystemExit) as exc:
+        _load_include_or_exit(p)
+    assert exc.value.code == 2
+    err = capsys.readouterr().err
+    assert "Could not read" in err
+    assert "as UTF-8 text" in err
