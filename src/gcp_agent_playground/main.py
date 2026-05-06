@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import typer
+from pydantic import ValidationError
 
 from . import profiles, workflows
 from .llm_client import LLMClient
@@ -15,7 +16,7 @@ app = typer.Typer(no_args_is_help=True, add_completion=False)
 def _run(profile_name: str, body) -> None:
     try:
         profile = profiles.load(profile_name)
-    except FileNotFoundError as e:
+    except (FileNotFoundError, ValidationError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(code=2)
 
