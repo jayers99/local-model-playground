@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a `--include <path>` flag to `gcp-agent chat` that reads a text file once at REPL start and folds it (with a clear delimiter) into the user's first turn.
+**Goal:** Add a `--include <path>` flag to `lmp chat` that reads a text file once at REPL start and folds it (with a clear delimiter) into the user's first turn.
 
 **Architecture:** Three new pure helpers in `workflows.py` — `_build_first_user_message`, `_human_size`, `_load_include_or_exit` — wired through an updated `chat()` and a new typer Option in `main.py`. The CLI framework (`typer`) handles existence/readability validation; only UTF-8 decoding is checked in `workflows.py`. No changes to the server, profiles, or `review`.
 
@@ -405,7 +405,7 @@ def chat(client: LLMClient, include_path: Path | None = None) -> None:
     """
     include_body = _load_include_or_exit(include_path)
     history: list[dict] = []
-    print("gcp-agent chat — Ctrl-D or 'exit' to quit\n")
+    print("lmp chat — Ctrl-D or 'exit' to quit\n")
     first_turn = True
     while True:
         try:
@@ -475,7 +475,7 @@ If `test_chat_include_missing_file_fails_before_profile_load`'s `mock_load.asser
 
 - [ ] **Step 6: Sanity-check the help output**
 
-Run: `uv run gcp-agent chat --help`
+Run: `uv run lmp chat --help`
 
 Expected: Help output shows `--include / -i PATH` with the help text. No errors. (`--help` does not enter the REPL.)
 
@@ -506,7 +506,7 @@ Append to `tests/test_smoke.py`:
 def test_chat_include_end_to_end() -> None:
     result = subprocess.run(
         [
-            "uv", "run", "gcp-agent", "chat",
+            "uv", "run", "lmp", "chat",
             "--profile", "heavy",
             "--include", str(EXAMPLE),
         ],
@@ -517,7 +517,7 @@ def test_chat_include_end_to_end() -> None:
     )
 
     assert result.returncode == 0, (
-        f"gcp-agent chat exited {result.returncode}\n"
+        f"lmp chat exited {result.returncode}\n"
         f"STDOUT:\n{result.stdout}\n"
         f"STDERR:\n{result.stderr}\n"
     )
@@ -579,7 +579,7 @@ If `notes/lessons-learned.md` does not yet have a manual-checklist section, look
 Append to the manual checklist (or create the section first):
 
 ```markdown
-- [ ] `chat --include`: run `gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.
+- [ ] `chat --include`: run `lmp chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.
 ```
 
 - [ ] **Step 3: Confirm the file changes look right**

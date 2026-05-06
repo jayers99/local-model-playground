@@ -12,9 +12,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 uv sync                                                       # install deps
-uv run gcp-agent chat --profile heavy                         # interactive REPL
-uv run gcp-agent chat --profile heavy --include <file>        # prepend a file to the first message
-uv run gcp-agent review --profile heavy <file>                # one-shot review → outputs/<ts>-review.md
+uv run lmp chat --profile heavy                         # interactive REPL
+uv run lmp chat --profile heavy --include <file>        # prepend a file to the first message
+uv run lmp review --profile heavy <file>                # one-shot review → outputs/<ts>-review.md
 uv run pytest                                                 # fast tests (no model)
 uv run pytest tests/test_cli.py::test_chat_help_includes_include_flag   # single test
 RUN_LIVE=1 uv run pytest -v                                   # also runs end-to-end smoke tests against a real local model

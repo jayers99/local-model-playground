@@ -1,4 +1,4 @@
-"""End-to-end smoke test for gcp-agent.
+"""End-to-end smoke test for lmp.
 
 Gated behind RUN_LIVE=1 because it loads a real local MLX model — far too
 heavy for default test runs. Invoke with:
@@ -24,14 +24,14 @@ def test_review_end_to_end() -> None:
     before = {p.name for p in OUTPUTS.glob("*-review.md")}
 
     result = subprocess.run(
-        ["uv", "run", "gcp-agent", "review", "--profile", "heavy", str(EXAMPLE)],
+        ["uv", "run", "lmp", "review", "--profile", "heavy", str(EXAMPLE)],
         capture_output=True,
         text=True,
         timeout=600,
     )
 
     assert result.returncode == 0, (
-        f"gcp-agent review exited {result.returncode}\n"
+        f"lmp review exited {result.returncode}\n"
         f"STDOUT:\n{result.stdout}\n"
         f"STDERR:\n{result.stderr}\n"
     )
@@ -58,7 +58,7 @@ def test_review_end_to_end() -> None:
 def test_chat_include_end_to_end() -> None:
     result = subprocess.run(
         [
-            "uv", "run", "gcp-agent", "chat",
+            "uv", "run", "lmp", "chat",
             "--profile", "heavy",
             "--include", str(EXAMPLE),
         ],
@@ -69,7 +69,7 @@ def test_chat_include_end_to_end() -> None:
     )
 
     assert result.returncode == 0, (
-        f"gcp-agent chat exited {result.returncode}\n"
+        f"lmp chat exited {result.returncode}\n"
         f"STDOUT:\n{result.stdout}\n"
         f"STDERR:\n{result.stderr}\n"
     )

@@ -157,7 +157,7 @@ mlx_lm.server \
 Build a small Python CLI named something like:
 
 ```text
-gcp-agent
+lmp
 ```
 
 The CLI should support three initial modes:
@@ -171,17 +171,17 @@ compare    Run light and heavy profiles against the same input and compare outpu
 Example commands:
 
 ```bash
-gcp-agent chat --profile light
+lmp chat --profile light
 
-gcp-agent review \
+lmp review \
   --profile light \
   examples/terraform/service-account-bad-editor.tf
 
-gcp-agent review \
+lmp review \
   --profile heavy \
   examples/tickets/service-account.md
 
-gcp-agent compare \
+lmp compare \
   examples/terraform/service-account-bad-editor.tf
 ```
 

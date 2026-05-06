@@ -217,7 +217,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# gcp-agent runtime artifacts
+# lmp runtime artifacts
 outputs/*
 !outputs/.gitkeep
 !outputs/.gitignore

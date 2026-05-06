@@ -24,7 +24,7 @@ The brief is a POC playground for local Apple-Silicon models advising on synthet
 | Decision                  | Choice                                                                                          |
 | ------------------------- | ----------------------------------------------------------------------------------------------- |
 | Dev hardware              | Heavy MacBook (M5 Max, 128 GB)                                                                  |
-| Server lifecycle          | CLI manages it — `gcp-agent` spawns `mlx_lm.server` per invocation, waits for ready, stops on exit |
+| Server lifecycle          | CLI manages it — `lmp` spawns `mlx_lm.server` per invocation, waits for ready, stops on exit |
 | Repo placement            | At the root of `local-model-playground/` (this repo *is* the project)                           |
 | Tests                     | Smoke-only — one gated end-to-end test plus a manual checklist                                  |
 | Model URI                 | Treat as TBD — v1 setup includes a "discover correct slug on `mlx-community`" step              |
@@ -38,12 +38,12 @@ The brief is a POC playground for local Apple-Silicon models advising on synthet
 
 ```
 ┌──────────────┐
-│  user shell  │  $ gcp-agent review examples/terraform/sa-bad-editor.tf --profile heavy
+│  user shell  │  $ lmp review examples/terraform/sa-bad-editor.tf --profile heavy
 └──────┬───────┘
        │
        ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│ gcp-agent CLI (typer)                                                │
+│ lmp CLI (typer)                                                │
 │                                                                      │
 │  1. parse args → profile name + workflow + input                     │
 │  2. profiles.load("heavy") → Profile (pydantic model)                │
@@ -64,7 +64,7 @@ The brief is a POC playground for local Apple-Silicon models advising on synthet
 
 ```
 local-model-playground/
-├── pyproject.toml              # uv-managed; declares gcp-agent script entry
+├── pyproject.toml              # uv-managed; declares lmp script entry
 ├── README.md                   # rewritten quickstart
 ├── docs/
 │   ├── idea.md                 # existing brief (untouched)
@@ -203,7 +203,7 @@ def review(input: Path = typer.Argument(..., exists=True, dir_okay=False),
 
 Both commands follow the same shape: load profile → start server (context manager) → build client → call workflow → return.
 
-`pyproject.toml` declares `gcp-agent = "local_model_playground.main:app"` as the script entry.
+`pyproject.toml` declares `lmp = "local_model_playground.main:app"` as the script entry.
 
 ## 5. First-slice file content
 
@@ -315,7 +315,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "local_model_playground.main:app"
+lmp = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]
@@ -330,8 +330,8 @@ Rewritten, short. Quickstart only:
 
 1. `uv sync`
 2. Pull the chosen MLX model (`huggingface-cli download <slug>`).
-3. `uv run gcp-agent chat --profile heavy`
-4. `uv run gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf`
+3. `uv run lmp chat --profile heavy`
+4. `uv run lmp review --profile heavy examples/terraform/service-account-bad-editor.tf`
 
 Pointers to `docs/idea.md`, this design doc, and `notes/future-hardening.md`.
 
@@ -380,7 +380,7 @@ One test, gated:
 ```python
 @pytest.mark.skipif(os.environ.get("RUN_LIVE") != "1", reason="needs local mlx model")
 def test_review_end_to_end(tmp_path):
-    # Run: gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf
+    # Run: lmp review --profile heavy examples/terraform/service-account-bad-editor.tf
     # Assert: exit 0, outputs/<ts>-review.md created, contains
     #   "## Summary", "## Findings", "## Validation evidence", "## Open questions",
     #   and "roles/editor" appears in Findings.
@@ -390,10 +390,10 @@ Run via `RUN_LIVE=1 uv run pytest`.
 
 ### 7.2 Manual smoke checklist (recorded in `notes/lessons-learned.md`)
 
-1. `uv sync` succeeds; `gcp-agent --help` lists `chat` and `review`.
+1. `uv sync` succeeds; `lmp --help` lists `chat` and `review`.
 2. `mlx_lm.server` launches and `/v1/models` responds within ~30 s on the heavy machine.
-3. `gcp-agent chat --profile heavy` — ask "Explain workload identity federation in two paragraphs"; tokens stream; response is coherent.
-4. `gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf` finds `roles/editor` is overly broad, recommends a narrower role, includes Validation Evidence and Open Questions.
+3. `lmp chat --profile heavy` — ask "Explain workload identity federation in two paragraphs"; tokens stream; response is coherent.
+4. `lmp review --profile heavy examples/terraform/service-account-bad-editor.tf` finds `roles/editor` is overly broad, recommends a narrower role, includes Validation Evidence and Open Questions.
 5. Ctrl-C during a long review → server process is gone (`ps aux | grep mlx_lm.server` returns nothing).
 6. Re-running `review` produces a second `outputs/<ts>-review.md` (no overwrite).
 7. With `--profile light` pointed at a smaller model, `chat` produces output (sanity check that profile swapping works).
@@ -401,7 +401,7 @@ Run via `RUN_LIVE=1 uv run pytest`.
 ### 7.3 Definition of done for v1
 
 - All Section 5 files exist with the content specified.
-- `gcp-agent chat` and `gcp-agent review` both run end-to-end on the heavy machine.
+- `lmp chat` and `lmp review` both run end-to-end on the heavy machine.
 - The smoke test passes with `RUN_LIVE=1`.
 - The manual checklist is walked once; surprises are recorded in `notes/lessons-learned.md`.
 - `notes/future-hardening.md` lists every deferred item from the brief plus those deferred from v1.

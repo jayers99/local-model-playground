@@ -53,11 +53,11 @@ Run via `uv run python scripts/bench_cold_start.py <profile>`, which times three
 
 Two findings:
 
-1. **`mlx_vlm.server` has a noticeably heavier import.** Listener-ready is consistently 2.6–4.6 s on the four `mlx_vlm.server` profiles vs. 0.5–1.1 s on the two `mlx_lm.server` profiles. Most of the time `gcp-agent` looks "stuck" before the model loads, it's actually mlx_vlm pulling in vision-tower modules. Heavy uses mlx_vlm because gemma-4 is multimodal-shaped, but text-only profiles boot the listener ~3 s faster.
+1. **`mlx_vlm.server` has a noticeably heavier import.** Listener-ready is consistently 2.6–4.6 s on the four `mlx_vlm.server` profiles vs. 0.5–1.1 s on the two `mlx_lm.server` profiles. Most of the time `lmp` looks "stuck" before the model loads, it's actually mlx_vlm pulling in vision-tower modules. Heavy uses mlx_vlm because gemma-4 is multimodal-shaped, but text-only profiles boot the listener ~3 s faster.
 2. **arch (GLM-4.5-Air, 57 GB on disk) is the only profile where first-token cost is meaningful at hot cache** — 10.7 s. The smaller gemma-4 variants stay sub-second because the file pages are already mapped and the model is small enough that load + prefill happens almost instantly. Truly cold-after-reboot numbers will be much larger for any profile bigger than ~30 GB; budget for it before claiming arch/x-heavy are usable interactively.
 
 Caveat: these are warm-disk, cold-process numbers. To reproduce a true cold start, run `sudo purge` (drops macOS file cache) before each invocation.
 
 ## Manual checklist (post-v1 features)
 
-- [ ] `chat --include`: run `gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.
+- [ ] `chat --include`: run `lmp chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.

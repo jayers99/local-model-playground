@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "local_model_playground.main:app"
+lmp = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]

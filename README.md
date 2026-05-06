@@ -1,6 +1,6 @@
 # local-model-playground
 
-Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs MLX-hosted local models (Gemma 4, GLM-4.5-Air, Qwen3-Coder) on Apple Silicon and exposes a small `gcp-agent` CLI for `chat` and `review` workflows.
+Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs MLX-hosted local models (Gemma 4, GLM-4.5-Air, Qwen3-Coder) on Apple Silicon and exposes a small `lmp` CLI for `chat` and `review` workflows.
 
 This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` for the full brief and non-goals.
 
@@ -18,15 +18,15 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 
 3. Chat:
 
-       uv run gcp-agent chat --profile heavy
+       uv run lmp chat --profile heavy
 
    To put a file in front of the model up front (avoids the long-paste pitfall), use `--include`:
 
-       uv run gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf
+       uv run lmp chat --profile heavy --include examples/terraform/service-account-bad-editor.tf
 
 4. Review the bundled example:
 
-       uv run gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf
+       uv run lmp review --profile heavy examples/terraform/service-account-bad-editor.tf
 
    The advisory Markdown lands in `outputs/<timestamp>-review.md`.
 

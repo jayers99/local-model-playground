@@ -1,4 +1,4 @@
-"""Profile loading for the gcp-agent CLI."""
+"""Profile loading for the lmp CLI."""
 from __future__ import annotations
 
 from pathlib import Path

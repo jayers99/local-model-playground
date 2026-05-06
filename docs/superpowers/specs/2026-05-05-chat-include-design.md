@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-05
 **Source:** `docs/backlog.md` → Feature backlog → priority:high
-**Scope:** A single new flag on the existing `gcp-agent chat` command. No changes to `review`, profiles, server lifecycle, or prompt templates.
+**Scope:** A single new flag on the existing `lmp chat` command. No changes to `review`, profiles, server lifecycle, or prompt templates.
 
 ## 1. Purpose
 
@@ -24,7 +24,7 @@ This closes the "I tried to paste a file and it went haywire" gap recorded in v1
 ## 3. CLI shape
 
 ```
-gcp-agent chat [--profile P] [--include PATH | -i PATH]
+lmp chat [--profile P] [--include PATH | -i PATH]
 ```
 
 - `--include` / `-i`: optional `Path`. Default `None`.
@@ -34,8 +34,8 @@ gcp-agent chat [--profile P] [--include PATH | -i PATH]
 ### Example session
 
 ```
-$ gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf
-gcp-agent chat — Ctrl-D or 'exit' to quit
+$ lmp chat --profile heavy --include examples/terraform/service-account-bad-editor.tf
+lmp chat — Ctrl-D or 'exit' to quit
 Loaded examples/terraform/service-account-bad-editor.tf (412 B) — included with your first message.
 
 you> what's wrong with this?
@@ -154,7 +154,7 @@ The file read and the size check happen *before* the REPL banner and *before* an
 
 ### 7.3 Live integration (`tests/test_smoke.py`, gated by `RUN_LIVE=1`)
 
-- One new case: run `gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf` in a subprocess, pipe `"what's wrong with this?\nexit\n"` to stdin, assert exit 0 and that stdout contains `roles/editor` (case-insensitive).
+- One new case: run `lmp chat --profile heavy --include examples/terraform/service-account-bad-editor.tf` in a subprocess, pipe `"what's wrong with this?\nexit\n"` to stdin, assert exit 0 and that stdout contains `roles/editor` (case-insensitive).
 
 ### 7.4 Manual checklist (added to `notes/lessons-learned.md`)
 

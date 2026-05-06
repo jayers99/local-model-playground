@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the First Implementation Slice of `gcp-agent` — a local CLI that spawns `mlx_lm.server` on the heavy MacBook profile, exposes `chat` and `review` commands, and writes a Markdown advisory for one synthetic Terraform example.
+**Goal:** Build the First Implementation Slice of `lmp` — a local CLI that spawns `mlx_lm.server` on the heavy MacBook profile, exposes `chat` and `review` commands, and writes a Markdown advisory for one synthetic Terraform example.
 
 **Architecture:** Python `typer` CLI wired to a flat-module package (`profiles`, `server`, `llm_client`, `workflows`, `render`). The CLI manages the `mlx_lm.server` subprocess per invocation and connects to it as an OpenAI-compatible HTTP endpoint via the `openai` SDK with token streaming.
 
@@ -88,7 +88,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "local_model_playground.main:app"
+lmp = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]
@@ -112,7 +112,7 @@ Create `src/local_model_playground/__init__.py` with empty content.
 Append (use Edit tool, do not rewrite the whole file):
 
 ```
-# gcp-agent runtime artifacts
+# lmp runtime artifacts
 outputs/*
 !outputs/.gitkeep
 !outputs/.gitignore
@@ -138,7 +138,7 @@ Run: `uv sync`
 
 Expected: creates `.venv`, installs deps, exits 0.
 
-Run: `uv run gcp-agent --help`
+Run: `uv run lmp --help`
 
 Expected: This will FAIL because `main:app` doesn't exist yet. The error should mention `ModuleNotFoundError: local_model_playground.main` — that's expected. We just want to confirm `uv sync` worked and the entry point is wired.
 
@@ -163,7 +163,7 @@ git commit -m "chore: scaffold local-model-playground Python project"
 Create `src/local_model_playground/profiles.py`:
 
 ```python
-"""Profile loading for the gcp-agent CLI."""
+"""Profile loading for the lmp CLI."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -603,7 +603,7 @@ def chat(client: LLMClient) -> None:
     'exit' or Ctrl-D to quit.
     """
     history: list[dict] = [{"role": "system", "content": _system_prompt()}]
-    print("gcp-agent chat — Ctrl-D or 'exit' to quit\n")
+    print("lmp chat — Ctrl-D or 'exit' to quit\n")
     while True:
         try:
             user = input("you> ").strip()
@@ -738,7 +738,7 @@ git commit -m "feat: write_review_md emits timestamped markdown with metadata he
 Create `src/local_model_playground/main.py`:
 
 ```python
-"""gcp-agent CLI entry point."""
+"""lmp CLI entry point."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -792,17 +792,17 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: Verify CLI surface**
 
-Run: `uv run gcp-agent --help`
+Run: `uv run lmp --help`
 
 Expected: typer help output listing `chat` and `review` commands.
 
-Run: `uv run gcp-agent review --help`
+Run: `uv run lmp review --help`
 
 Expected: help text showing `INPUT` argument and `--profile/-p` option.
 
 - [ ] **Step 3: Verify error path with bad profile name**
 
-Run: `uv run gcp-agent chat --profile nope`
+Run: `uv run lmp chat --profile nope`
 
 Expected: prints `Profile 'nope' not found at profiles/nope.yaml` to stderr and exits non-zero (code 2).
 
@@ -878,7 +878,7 @@ This file is filled in as v1 is exercised. After walking the manual smoke checkl
 ```markdown
 # local-model-playground
 
-Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs a local MLX-hosted Gemma model on Apple Silicon and exposes a small `gcp-agent` CLI for `chat` and `review` workflows.
+Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs a local MLX-hosted Gemma model on Apple Silicon and exposes a small `lmp` CLI for `chat` and `review` workflows.
 
 This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` for the full brief and non-goals.
 
@@ -894,11 +894,11 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 
 3. Chat:
 
-       uv run gcp-agent chat --profile heavy
+       uv run lmp chat --profile heavy
 
 4. Review the bundled example:
 
-       uv run gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf
+       uv run lmp review --profile heavy examples/terraform/service-account-bad-editor.tf
 
    The advisory Markdown lands in `outputs/<timestamp>-review.md`.
 
@@ -944,7 +944,7 @@ Create empty `tests/__init__.py`.
 Create `tests/test_smoke.py`:
 
 ```python
-"""End-to-end smoke test for gcp-agent.
+"""End-to-end smoke test for lmp.
 
 Gated behind RUN_LIVE=1 because it loads a real local MLX model — far too
 heavy for default test runs. Invoke with:
@@ -970,14 +970,14 @@ def test_review_end_to_end() -> None:
     before = {p.name for p in OUTPUTS.glob("*-review.md")}
 
     result = subprocess.run(
-        ["uv", "run", "gcp-agent", "review", "--profile", "heavy", str(EXAMPLE)],
+        ["uv", "run", "lmp", "review", "--profile", "heavy", str(EXAMPLE)],
         capture_output=True,
         text=True,
         timeout=600,
     )
 
     assert result.returncode == 0, (
-        f"gcp-agent review exited {result.returncode}\n"
+        f"lmp review exited {result.returncode}\n"
         f"STDOUT:\n{result.stdout}\n"
         f"STDERR:\n{result.stderr}\n"
     )
@@ -1010,7 +1010,7 @@ Expected: 1 skipped, 0 failed.
 
 ```bash
 git add tests/__init__.py tests/test_smoke.py
-git commit -m "test: gated end-to-end smoke for gcp-agent review"
+git commit -m "test: gated end-to-end smoke for lmp review"
 ```
 
 ---
@@ -1038,13 +1038,13 @@ Expected: 1 passed. Cold-start may take 30 s – 2 min for the model to load bef
 
 For each item, record observation in `notes/lessons-learned.md`:
 
-1. `uv run gcp-agent --help` lists `chat` and `review`.
+1. `uv run lmp --help` lists `chat` and `review`.
 2. Server `/v1/models` responds within ~30 s (note actual time observed).
-3. `uv run gcp-agent chat --profile heavy` — ask: *"Explain workload identity federation in two paragraphs."* Tokens stream; response is coherent.
-4. `uv run gcp-agent review --profile heavy examples/terraform/service-account-bad-editor.tf` — finds `roles/editor` is overly broad, recommends a narrower role, includes Validation Evidence and Open Questions.
+3. `uv run lmp chat --profile heavy` — ask: *"Explain workload identity federation in two paragraphs."* Tokens stream; response is coherent.
+4. `uv run lmp review --profile heavy examples/terraform/service-account-bad-editor.tf` — finds `roles/editor` is overly broad, recommends a narrower role, includes Validation Evidence and Open Questions.
 5. During a long review, hit Ctrl-C. Then run `pgrep -f mlx_lm.server` — expect no output (server cleaned up).
 6. Run `review` twice in a row. Confirm two distinct timestamped files exist in `outputs/`.
-7. (Optional) Edit `profiles/light.yaml` to point at any small Gemma model and run `gcp-agent chat --profile light` for a quick sanity check that profile swapping works. Revert any non-final edit afterward.
+7. (Optional) Edit `profiles/light.yaml` to point at any small Gemma model and run `lmp chat --profile light` for a quick sanity check that profile swapping works. Revert any non-final edit afterward.
 
 - [ ] **Step 4: Commit lessons-learned updates**
 
@@ -1058,7 +1058,7 @@ git commit -m "docs: capture v1 smoke + manual checklist observations"
 At this point all spec §7.3 acceptance criteria are met:
 
 - All Section 5 spec files exist with the content specified.
-- `gcp-agent chat` and `gcp-agent review` both run end-to-end on the heavy machine.
+- `lmp chat` and `lmp review` both run end-to-end on the heavy machine.
 - The smoke test passes with `RUN_LIVE=1`.
 - The manual checklist has been walked and observations are in `notes/lessons-learned.md`.
 - `notes/future-hardening.md` lists every deferred item.

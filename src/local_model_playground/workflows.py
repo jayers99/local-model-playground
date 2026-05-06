@@ -103,7 +103,7 @@ def chat(client: LLMClient, include_path: Path | None = None) -> None:
     """
     include_body = _load_include_or_exit(include_path)
     history: list[dict] = []
-    print("gcp-agent chat — Ctrl-D or 'exit' to quit\n")
+    print("lmp chat — Ctrl-D or 'exit' to quit\n")
     first_turn = True
     while True:
         try:
