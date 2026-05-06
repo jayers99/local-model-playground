@@ -1,7 +1,7 @@
 name: heavy
 description: "128 GB MacBook profile for deeper local synthesis"
 runtime: mlx
-model: mlx-community/gemma-2-27b-it-4bit
+model: mlx-community/gemma-2-9b-it-4bit
 host: 127.0.0.1
 port: 8080
 base_url: http://127.0.0.1:8080/v1

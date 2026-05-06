@@ -12,7 +12,7 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 
 2. Pre-pull the MLX model declared in `profiles/heavy.yaml`:
 
-       uv run hf download mlx-community/gemma-2-27b-it-4bit
+       uv run hf download mlx-community/gemma-2-9b-it-4bit
 
    (`huggingface-cli` is deprecated as of `huggingface_hub` 1.13 — use `hf`.)
 
