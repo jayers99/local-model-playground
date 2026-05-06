@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from gcp_agent_playground.workflows import (
+from local_model_playground.workflows import (
     INCLUDE_SIZE_WARN_BYTES,
     _build_first_user_message,
     _human_size,
@@ -109,7 +109,7 @@ def test_chat_only_prepends_include_on_first_turn(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The include is folded into turn 1's user message; turn 2 is bare user text."""
-    from gcp_agent_playground import workflows
+    from local_model_playground import workflows
 
     monkeypatch.setattr(workflows, "_system_prompt", lambda: "SYS")
 

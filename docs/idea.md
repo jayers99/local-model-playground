@@ -308,7 +308,7 @@ Claude Code may be used to implement the harness. Local Gemma is the model under
 ## Suggested Repository Layout
 
 ```text
-gcp-agent-playground/
+local-model-playground/
   README.md
   pyproject.toml
 
@@ -333,7 +333,7 @@ gcp-agent-playground/
     acceptance_to_validation.md
 
   src/
-    gcp_agent_playground/
+    local_model_playground/
       __init__.py
       main.py
       llm_client.py

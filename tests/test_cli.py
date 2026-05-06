@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from gcp_agent_playground.main import app
+from local_model_playground.main import app
 
 
 def test_chat_help_includes_include_flag() -> None:
@@ -22,7 +22,7 @@ def test_chat_include_missing_file_fails_before_profile_load() -> None:
     *before* profiles.load runs (so we never spin a server on a bad include).
     """
     runner = CliRunner()
-    with patch("gcp_agent_playground.profiles.load") as mock_load:
+    with patch("local_model_playground.profiles.load") as mock_load:
         result = runner.invoke(
             app,
             ["chat", "--include", "/definitely/not/here.tf", "--profile", "heavy"],

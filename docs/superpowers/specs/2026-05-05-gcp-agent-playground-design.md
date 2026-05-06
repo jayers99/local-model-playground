@@ -78,7 +78,7 @@ local-model-playground/
 ├── examples/
 │   └── terraform/
 │       └── service-account-bad-editor.tf
-├── src/gcp_agent_playground/
+├── src/local_model_playground/
 │   ├── __init__.py
 │   ├── main.py                 # typer app
 │   ├── profiles.py             # YAML load + pydantic Profile model
@@ -203,7 +203,7 @@ def review(input: Path = typer.Argument(..., exists=True, dir_okay=False),
 
 Both commands follow the same shape: load profile → start server (context manager) → build client → call workflow → return.
 
-`pyproject.toml` declares `gcp-agent = "gcp_agent_playground.main:app"` as the script entry.
+`pyproject.toml` declares `gcp-agent = "local_model_playground.main:app"` as the script entry.
 
 ## 5. First-slice file content
 
@@ -302,7 +302,7 @@ Bullet list combining the brief's "Deferred Hardening Notes" verbatim plus the i
 
 ```toml
 [project]
-name = "gcp-agent-playground"
+name = "local-model-playground"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
@@ -315,7 +315,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "gcp_agent_playground.main:app"
+gcp-agent = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]

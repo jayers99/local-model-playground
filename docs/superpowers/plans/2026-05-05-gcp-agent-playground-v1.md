@@ -65,7 +65,7 @@ This task produces a value, not a code change. Move to Task 2.
 
 **Files:**
 - Create: `pyproject.toml`
-- Create: `src/gcp_agent_playground/__init__.py` (empty)
+- Create: `src/local_model_playground/__init__.py` (empty)
 - Modify: `.gitignore` (append outputs rules)
 - Create: `outputs/.gitkeep` (empty)
 - Create: `outputs/.gitignore`
@@ -74,7 +74,7 @@ This task produces a value, not a code change. Move to Task 2.
 
 ```toml
 [project]
-name = "gcp-agent-playground"
+name = "local-model-playground"
 version = "0.1.0"
 description = "Local agentic AI playground for synthetic GCP/Terraform advisory tasks"
 requires-python = ">=3.11"
@@ -88,14 +88,14 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "gcp_agent_playground.main:app"
+gcp-agent = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/gcp_agent_playground"]
+packages = ["src/local_model_playground"]
 
 [dependency-groups]
 dev = [
@@ -105,7 +105,7 @@ dev = [
 
 - [ ] **Step 2: Create the package init**
 
-Create `src/gcp_agent_playground/__init__.py` with empty content.
+Create `src/local_model_playground/__init__.py` with empty content.
 
 - [ ] **Step 3: Append outputs rules to `.gitignore`**
 
@@ -140,13 +140,13 @@ Expected: creates `.venv`, installs deps, exits 0.
 
 Run: `uv run gcp-agent --help`
 
-Expected: This will FAIL because `main:app` doesn't exist yet. The error should mention `ModuleNotFoundError: gcp_agent_playground.main` — that's expected. We just want to confirm `uv sync` worked and the entry point is wired.
+Expected: This will FAIL because `main:app` doesn't exist yet. The error should mention `ModuleNotFoundError: local_model_playground.main` — that's expected. We just want to confirm `uv sync` worked and the entry point is wired.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pyproject.toml uv.lock src/gcp_agent_playground/__init__.py .gitignore outputs/.gitkeep outputs/.gitignore
-git commit -m "chore: scaffold gcp-agent-playground Python project"
+git add pyproject.toml uv.lock src/local_model_playground/__init__.py .gitignore outputs/.gitkeep outputs/.gitignore
+git commit -m "chore: scaffold local-model-playground Python project"
 ```
 
 ---
@@ -154,13 +154,13 @@ git commit -m "chore: scaffold gcp-agent-playground Python project"
 ### Task 3: Profile loading
 
 **Files:**
-- Create: `src/gcp_agent_playground/profiles.py`
+- Create: `src/local_model_playground/profiles.py`
 - Create: `profiles/heavy.yaml`
 - Create: `profiles/light.yaml`
 
 - [ ] **Step 1: Write `profiles.py`**
 
-Create `src/gcp_agent_playground/profiles.py`:
+Create `src/local_model_playground/profiles.py`:
 
 ```python
 """Profile loading for the gcp-agent CLI."""
@@ -239,7 +239,7 @@ intended_use:
 Run a one-liner to confirm parsing:
 
 ```bash
-uv run python -c "from gcp_agent_playground.profiles import load; p = load('heavy'); print(p.model, p.base_url)"
+uv run python -c "from local_model_playground.profiles import load; p = load('heavy'); print(p.model, p.base_url)"
 ```
 
 Expected: prints the chosen model slug and `http://127.0.0.1:8080/v1`.
@@ -247,7 +247,7 @@ Expected: prints the chosen model slug and `http://127.0.0.1:8080/v1`.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/gcp_agent_playground/profiles.py profiles/heavy.yaml profiles/light.yaml
+git add src/local_model_playground/profiles.py profiles/heavy.yaml profiles/light.yaml
 git commit -m "feat: profile loader with pydantic schema and heavy/light yaml"
 ```
 
@@ -258,11 +258,11 @@ git commit -m "feat: profile loader with pydantic schema and heavy/light yaml"
 This is the most subprocess-heavy module. It owns starting `mlx_lm.server`, polling readiness, and guaranteed cleanup.
 
 **Files:**
-- Create: `src/gcp_agent_playground/server.py`
+- Create: `src/local_model_playground/server.py`
 
 - [ ] **Step 1: Write `server.py`**
 
-Create `src/gcp_agent_playground/server.py`:
+Create `src/local_model_playground/server.py`:
 
 ```python
 """Lifecycle wrapper for a local mlx_lm.server subprocess."""
@@ -403,7 +403,7 @@ class MLXServer:
 
 - [ ] **Step 2: Sanity-check by importing**
 
-Run: `uv run python -c "from gcp_agent_playground.server import MLXServer; print('ok')"`
+Run: `uv run python -c "from local_model_playground.server import MLXServer; print('ok')"`
 
 Expected: prints `ok` (no syntax/import errors).
 
@@ -412,7 +412,7 @@ We are deferring the live start/stop test to the end-to-end smoke test in Task 1
 - [ ] **Step 3: Commit**
 
 ```bash
-git add src/gcp_agent_playground/server.py
+git add src/local_model_playground/server.py
 git commit -m "feat: subprocess lifecycle for local mlx_lm.server"
 ```
 
@@ -421,11 +421,11 @@ git commit -m "feat: subprocess lifecycle for local mlx_lm.server"
 ### Task 5: LLM client
 
 **Files:**
-- Create: `src/gcp_agent_playground/llm_client.py`
+- Create: `src/local_model_playground/llm_client.py`
 
 - [ ] **Step 1: Write `llm_client.py`**
 
-Create `src/gcp_agent_playground/llm_client.py`:
+Create `src/local_model_playground/llm_client.py`:
 
 ```python
 """Thin OpenAI-SDK wrapper pointed at the local mlx_lm.server."""
@@ -460,14 +460,14 @@ class LLMClient:
 
 - [ ] **Step 2: Sanity-check by importing**
 
-Run: `uv run python -c "from gcp_agent_playground.llm_client import LLMClient; print('ok')"`
+Run: `uv run python -c "from local_model_playground.llm_client import LLMClient; print('ok')"`
 
 Expected: prints `ok`.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add src/gcp_agent_playground/llm_client.py
+git add src/local_model_playground/llm_client.py
 git commit -m "feat: openai-sdk wrapper for local mlx server with token streaming"
 ```
 
@@ -574,11 +574,11 @@ git commit -m "feat: system + terraform-reviewer prompts and one synthetic examp
 ### Task 7: Workflows
 
 **Files:**
-- Create: `src/gcp_agent_playground/workflows.py`
+- Create: `src/local_model_playground/workflows.py`
 
 - [ ] **Step 1: Write `workflows.py`**
 
-Create `src/gcp_agent_playground/workflows.py`:
+Create `src/local_model_playground/workflows.py`:
 
 ```python
 """High-level workflows: chat REPL and one-shot review."""
@@ -645,14 +645,14 @@ def review(client: LLMClient, input_path: Path) -> Path:
 
 - [ ] **Step 2: Sanity-check by importing**
 
-Run: `uv run python -c "from gcp_agent_playground.workflows import chat, review; print('ok')"`
+Run: `uv run python -c "from local_model_playground.workflows import chat, review; print('ok')"`
 
 Expected: prints `ok`.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add src/gcp_agent_playground/workflows.py
+git add src/local_model_playground/workflows.py
 git commit -m "feat: chat REPL and one-shot review workflows"
 ```
 
@@ -661,11 +661,11 @@ git commit -m "feat: chat REPL and one-shot review workflows"
 ### Task 8: Output rendering
 
 **Files:**
-- Create: `src/gcp_agent_playground/render.py`
+- Create: `src/local_model_playground/render.py`
 
 - [ ] **Step 1: Write `render.py`**
 
-Create `src/gcp_agent_playground/render.py`:
+Create `src/local_model_playground/render.py`:
 
 ```python
 """Markdown output rendering for review workflows."""
@@ -703,8 +703,8 @@ Run:
 ```bash
 uv run python -c "
 from pathlib import Path
-from gcp_agent_playground.render import write_review_md
-from gcp_agent_playground.profiles import load
+from local_model_playground.render import write_review_md
+from local_model_playground.profiles import load
 p = write_review_md(body='# test\n\nbody\n', source=Path('examples/terraform/service-account-bad-editor.tf'), profile=load('heavy'))
 print('wrote', p)
 print(p.read_text()[:300])
@@ -722,7 +722,7 @@ rm outputs/*-review.md
 - [ ] **Step 3: Commit**
 
 ```bash
-git add src/gcp_agent_playground/render.py
+git add src/local_model_playground/render.py
 git commit -m "feat: write_review_md emits timestamped markdown with metadata header"
 ```
 
@@ -731,11 +731,11 @@ git commit -m "feat: write_review_md emits timestamped markdown with metadata he
 ### Task 9: CLI wiring
 
 **Files:**
-- Create: `src/gcp_agent_playground/main.py`
+- Create: `src/local_model_playground/main.py`
 
 - [ ] **Step 1: Write `main.py`**
 
-Create `src/gcp_agent_playground/main.py`:
+Create `src/local_model_playground/main.py`:
 
 ```python
 """gcp-agent CLI entry point."""
@@ -809,7 +809,7 @@ Expected: prints `Profile 'nope' not found at profiles/nope.yaml` to stderr and 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add src/gcp_agent_playground/main.py
+git add src/local_model_playground/main.py
 git commit -m "feat: typer CLI wires chat and review through profile + server lifecycle"
 ```
 
@@ -876,7 +876,7 @@ This file is filled in as v1 is exercised. After walking the manual smoke checkl
 - [ ] **Step 3: Rewrite `README.md`**
 
 ```markdown
-# gcp-agent-playground
+# local-model-playground
 
 Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs a local MLX-hosted Gemma model on Apple Silicon and exposes a small `gcp-agent` CLI for `chat` and `review` workflows.
 
@@ -910,7 +910,7 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 - `profiles/` — per-machine MLX runtime profiles
 - `prompts/` — system + workflow prompt templates
 - `examples/` — synthetic inputs
-- `src/gcp_agent_playground/` — the CLI implementation
+- `src/local_model_playground/` — the CLI implementation
 - `outputs/` — generated reviews (gitignored)
 - `notes/future-hardening.md` — deferred work
 - `notes/lessons-learned.md` — observations

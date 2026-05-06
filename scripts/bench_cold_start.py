@@ -20,10 +20,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from gcp_agent_playground import profiles
-from gcp_agent_playground.llm_client import LLMClient
-from gcp_agent_playground.server import MLXServer
-from gcp_agent_playground.workflows import _prepend_system
+from local_model_playground import profiles
+from local_model_playground.llm_client import LLMClient
+from local_model_playground.server import MLXServer
+from local_model_playground.workflows import _prepend_system
 
 
 def main(profile_name: str) -> None:

@@ -1,4 +1,4 @@
-# gcp-agent-playground
+# local-model-playground
 
 Local agentic AI playground for synthetic GCP/Terraform advisory tasks. Runs MLX-hosted local models (Gemma 4, GLM-4.5-Air, Qwen3-Coder) on Apple Silicon and exposes a small `gcp-agent` CLI for `chat` and `review` workflows.
 
@@ -53,7 +53,7 @@ Pre-pull any of them with `uv run hf download <slug>`. Profiles share port 8080,
 - `profiles/` — per-machine MLX runtime profiles
 - `prompts/` — system + workflow prompt templates
 - `examples/` — synthetic inputs
-- `src/gcp_agent_playground/` — the CLI implementation
+- `src/local_model_playground/` — the CLI implementation
 - `outputs/` — generated reviews (gitignored)
 - `notes/future-hardening.md` — deferred work
 - `notes/lessons-learned.md` — observations

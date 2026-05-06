@@ -70,7 +70,7 @@ The existing `_prepend_system` helper still merges the system prompt onto the fr
 
 ## 5. Module changes
 
-### 5.1 `src/gcp_agent_playground/workflows.py`
+### 5.1 `src/local_model_playground/workflows.py`
 
 - New module constant: `INCLUDE_SIZE_WARN_BYTES = 64 * 1024`.
 - New pure helper:
@@ -110,7 +110,7 @@ The existing `_prepend_system` helper still merges the system prompt onto the fr
   - `n ≥ 1024*1024` → `"<n/1024/1024:.1f> MB"` (one decimal; e.g. `2.3 MB`).
   - Lives in `workflows.py`; not worth a new module.
 
-### 5.2 `src/gcp_agent_playground/main.py`
+### 5.2 `src/local_model_playground/main.py`
 
 - `chat` command gains:
 

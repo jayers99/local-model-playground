@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-`gcp-agent-playground` is a learning POC, not production tooling. It exists to explore whether local Apple-Silicon MLX models can support lightweight advisory workflows (GCP/Terraform review, concept explanation, ticket decomposition). See `docs/idea.md` for the full brief and explicit non-goals.
+`local-model-playground` is a learning POC, not production tooling. It exists to explore whether local Apple-Silicon MLX models can support lightweight advisory workflows (GCP/Terraform review, concept explanation, ticket decomposition). See `docs/idea.md` for the full brief and explicit non-goals.
 
 **Synthetic inputs only.** Never feed real corporate data, real tickets, real project IDs, or secrets through this harness — the brief lists this as a hard constraint.
 
@@ -41,7 +41,7 @@ main.py (typer)
 Key invariants:
 
 - **Server lifecycle is bound to one CLI invocation.** Every command cold-starts the model server, runs, then stops. There is no daemon mode (yet — see `docs/backlog.md`). Cold-start time on heavy is the dominant UX cost.
-- **Profiles are the single configuration surface.** Model slug, server binary (`mlx_lm.server` for text-only, `mlx_vlm.server` for multimodal), port, temperature, and max_tokens all live in `profiles/<name>.yaml`. The pydantic schema is in `src/gcp_agent_playground/profiles.py`.
+- **Profiles are the single configuration surface.** Model slug, server binary (`mlx_lm.server` for text-only, `mlx_vlm.server` for multimodal), port, temperature, and max_tokens all live in `profiles/<name>.yaml`. The pydantic schema is in `src/local_model_playground/profiles.py`.
 - **gemma-4 weights are multimodal-shaped** (checkpoint tensors prefixed with `language_model.`), so every gemma-4 profile needs `mlx_vlm.server`. `mlx_lm.server` boots the HTTP listener fine but crashes the loader thread on first generation with `ValueError: Received N parameters not in model: language_model.model.layers...`. If you add a new gemma profile and generation hangs after `agent> `, this is almost certainly the cause — check the latest `outputs/.server-logs/*.log`. Non-gemma text-only models (GLM-4.5-Air, Qwen3-Coder) use `mlx_lm.server` instead.
 - **All profiles share port 8080**, so you can only run one at a time. The `compare` command in the backlog will need to either serialize (stop heavy → start light) or assign distinct ports.
 - **Gemma's chat template rejects the `system` role.** `mlx_lm.server` returns 404 `{"error": "System role not supported"}` if you send one. `workflows._prepend_system` works around this by merging `prompts/system.md` into the first user message. Don't add a system role anywhere — re-use that helper.
@@ -65,7 +65,7 @@ All six validated end-to-end (boot + single-turn generation) on 2026-05-05. Heav
 
 ## Where things live
 
-- `src/gcp_agent_playground/` — five modules; see Architecture above
+- `src/local_model_playground/` — five modules; see Architecture above
 - `prompts/system.md`, `prompts/terraform_reviewer.md` — prompt templates (read at runtime)
 - `examples/terraform/` — synthetic Terraform inputs for `review`
 - `outputs/` — generated reviews + server logs (gitignored)

@@ -25,7 +25,7 @@ The first delivered increment: a pure function that returns the user's typed mes
 
 **Files:**
 - Create: `tests/test_workflows.py`
-- Modify: `src/gcp_agent_playground/workflows.py` (add helper + import `Path` if not already present)
+- Modify: `src/local_model_playground/workflows.py` (add helper + import `Path` if not already present)
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -37,7 +37,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gcp_agent_playground.workflows import _build_first_user_message
+from local_model_playground.workflows import _build_first_user_message
 
 
 def test_build_first_user_message_no_include() -> None:
@@ -78,7 +78,7 @@ Expected: `ImportError` or `AttributeError` — `_build_first_user_message` does
 
 - [ ] **Step 3: Implement the helper**
 
-Open `src/gcp_agent_playground/workflows.py`. Add `from pathlib import Path` if not already imported (it is). After the existing `_prepend_system` function (around line 27), add:
+Open `src/local_model_playground/workflows.py`. Add `from pathlib import Path` if not already imported (it is). After the existing `_prepend_system` function (around line 27), add:
 
 ```python
 def _build_first_user_message(
@@ -114,7 +114,7 @@ If `test_build_first_user_message_with_include` fails on a whitespace mismatch, 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add tests/test_workflows.py src/gcp_agent_playground/workflows.py
+git add tests/test_workflows.py src/local_model_playground/workflows.py
 git commit -m "feat(chat): add _build_first_user_message helper"
 ```
 
@@ -126,7 +126,7 @@ A formatter for the local echo line. Pinned to the format in spec §5.1: `412 B`
 
 **Files:**
 - Modify: `tests/test_workflows.py` (append)
-- Modify: `src/gcp_agent_playground/workflows.py` (append helper)
+- Modify: `src/local_model_playground/workflows.py` (append helper)
 
 - [ ] **Step 1: Append the failing tests**
 
@@ -135,13 +135,13 @@ Append to `tests/test_workflows.py` (under the existing tests, same module-level
 First, update the import line at the top from:
 
 ```python
-from gcp_agent_playground.workflows import _build_first_user_message
+from local_model_playground.workflows import _build_first_user_message
 ```
 
 to:
 
 ```python
-from gcp_agent_playground.workflows import _build_first_user_message, _human_size
+from local_model_playground.workflows import _build_first_user_message, _human_size
 ```
 
 Then append at the bottom of the file:
@@ -172,7 +172,7 @@ Expected: import fails with `ImportError: cannot import name '_human_size'`. All
 
 - [ ] **Step 3: Implement the helper**
 
-Append to `src/gcp_agent_playground/workflows.py` after `_build_first_user_message`:
+Append to `src/local_model_playground/workflows.py` after `_build_first_user_message`:
 
 ```python
 def _human_size(n: int) -> str:
@@ -198,7 +198,7 @@ Expected: 6 passed (3 from Task 1 + 3 new).
 - [ ] **Step 5: Commit**
 
 ```bash
-git add tests/test_workflows.py src/gcp_agent_playground/workflows.py
+git add tests/test_workflows.py src/local_model_playground/workflows.py
 git commit -m "feat(chat): add _human_size formatter for include echo"
 ```
 
@@ -210,7 +210,7 @@ This helper does the only I/O on the include path: read the text, print the loca
 
 **Files:**
 - Modify: `tests/test_workflows.py` (append tests)
-- Modify: `src/gcp_agent_playground/workflows.py` (add `INCLUDE_SIZE_WARN_BYTES` constant + helper)
+- Modify: `src/local_model_playground/workflows.py` (add `INCLUDE_SIZE_WARN_BYTES` constant + helper)
 
 - [ ] **Step 1: Append the failing tests**
 
@@ -219,7 +219,7 @@ Update the import at the top of `tests/test_workflows.py` to:
 ```python
 import pytest
 
-from gcp_agent_playground.workflows import (
+from local_model_playground.workflows import (
     INCLUDE_SIZE_WARN_BYTES,
     _build_first_user_message,
     _human_size,
@@ -281,7 +281,7 @@ Expected: import fails — `INCLUDE_SIZE_WARN_BYTES` and `_load_include_or_exit`
 
 - [ ] **Step 3: Implement the constant and helper**
 
-In `src/gcp_agent_playground/workflows.py`, near the top (after existing imports, before `PROMPTS_DIR`), add:
+In `src/local_model_playground/workflows.py`, near the top (after existing imports, before `PROMPTS_DIR`), add:
 
 ```python
 INCLUDE_SIZE_WARN_BYTES = 64 * 1024
@@ -331,7 +331,7 @@ If `test_load_include_exits_on_non_utf8` fails because `read_text()` didn't rais
 - [ ] **Step 5: Commit**
 
 ```bash
-git add tests/test_workflows.py src/gcp_agent_playground/workflows.py
+git add tests/test_workflows.py src/local_model_playground/workflows.py
 git commit -m "feat(chat): add _load_include_or_exit with size warn + decode-error exit"
 ```
 
@@ -342,8 +342,8 @@ git commit -m "feat(chat): add _load_include_or_exit with size warn + decode-err
 Now hook the helpers into the REPL and surface the flag in typer. Also add a CLI wiring test that confirms typer's existence check fires *before* the profile is loaded.
 
 **Files:**
-- Modify: `src/gcp_agent_playground/workflows.py` (replace `chat()` body)
-- Modify: `src/gcp_agent_playground/main.py` (add `--include` Option, update lambda)
+- Modify: `src/local_model_playground/workflows.py` (replace `chat()` body)
+- Modify: `src/local_model_playground/main.py` (add `--include` Option, update lambda)
 - Create: `tests/test_cli.py`
 
 - [ ] **Step 1: Write the failing CLI wiring tests**
@@ -358,7 +358,7 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from gcp_agent_playground.main import app
+from local_model_playground.main import app
 
 
 def test_chat_help_includes_include_flag() -> None:
@@ -375,7 +375,7 @@ def test_chat_include_missing_file_fails_before_profile_load() -> None:
     *before* profiles.load runs (so we never spin a server on a bad include).
     """
     runner = CliRunner()
-    with patch("gcp_agent_playground.profiles.load") as mock_load:
+    with patch("local_model_playground.profiles.load") as mock_load:
         result = runner.invoke(
             app,
             ["chat", "--include", "/definitely/not/here.tf", "--profile", "heavy"],
@@ -394,7 +394,7 @@ Expected:
 
 - [ ] **Step 3: Update `chat()` in `workflows.py`**
 
-Open `src/gcp_agent_playground/workflows.py`. Replace the existing `chat()` function (the one currently around lines 29–52) with:
+Open `src/local_model_playground/workflows.py`. Replace the existing `chat()` function (the one currently around lines 29–52) with:
 
 ```python
 def chat(client: LLMClient, include_path: Path | None = None) -> None:
@@ -434,7 +434,7 @@ def chat(client: LLMClient, include_path: Path | None = None) -> None:
 
 - [ ] **Step 4: Update `main.py` to surface `--include`**
 
-Open `src/gcp_agent_playground/main.py`. Replace the current `chat` command (around lines 32–35):
+Open `src/local_model_playground/main.py`. Replace the current `chat` command (around lines 32–35):
 
 ```python
 @app.command()
@@ -484,7 +484,7 @@ Expected: Help output shows `--include / -i PATH` with the help text. No errors.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add tests/test_cli.py src/gcp_agent_playground/workflows.py src/gcp_agent_playground/main.py
+git add tests/test_cli.py src/local_model_playground/workflows.py src/local_model_playground/main.py
 git commit -m "feat(chat): wire --include path through chat REPL"
 ```
 

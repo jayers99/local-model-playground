@@ -1,6 +1,6 @@
 # Backlog
 
-Forward work for `gcp-agent-playground` after v1. Use checkboxes; mark items done as they land.
+Forward work for `local-model-playground` after v1. Use checkboxes; mark items done as they land.
 
 For the deferred-hardening register (corporate data handling, audit trail, redaction, etc.), see `notes/future-hardening.md` instead — that file is the long-tail security/compliance ledger; this file is the active feature queue.
 

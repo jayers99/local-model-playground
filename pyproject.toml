@@ -1,5 +1,5 @@
 [project]
-name = "gcp-agent-playground"
+name = "local-model-playground"
 version = "0.1.0"
 description = "Local agentic AI playground for synthetic GCP/Terraform advisory tasks"
 requires-python = ">=3.11"
@@ -14,14 +14,14 @@ dependencies = [
 ]
 
 [project.scripts]
-gcp-agent = "gcp_agent_playground.main:app"
+gcp-agent = "local_model_playground.main:app"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/gcp_agent_playground"]
+packages = ["src/local_model_playground"]
 
 [dependency-groups]
 dev = [
