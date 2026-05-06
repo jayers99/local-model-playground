@@ -38,7 +38,8 @@ def _build_first_user_message(
     """
     if include_path is None:
         return user_text
-    assert include_body is not None
+    if include_body is None:
+        raise ValueError("include_body must be provided when include_path is set")
     return (
         f"--- BEGIN INCLUDED FILE: {include_path} ---\n"
         f"{include_body}\n"
