@@ -26,6 +26,28 @@ def _prepend_system(messages: list[dict]) -> list[dict]:
     return out
 
 
+def _build_first_user_message(
+    user_text: str,
+    include_path: Path | None,
+    include_body: str | None,
+) -> str:
+    """Wrap user_text with delimited include content if a file was included.
+
+    No I/O — caller passes the already-read body. When include_path is None,
+    returns user_text unchanged.
+    """
+    if include_path is None:
+        return user_text
+    assert include_body is not None
+    return (
+        f"--- BEGIN INCLUDED FILE: {include_path} ---\n"
+        f"{include_body}\n"
+        f"--- END INCLUDED FILE: {include_path} ---\n"
+        f"\n"
+        f"{user_text}"
+    )
+
+
 def chat(client: LLMClient) -> None:
     """Interactive REPL. Read a user line, stream the assistant reply, repeat.
 
