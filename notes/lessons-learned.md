@@ -33,3 +33,7 @@ Architectural takeaway: the `LLMClient` is a generic OpenAI SDK pointed at `base
 Workflow change forced by Gemma's chat template:
 
 - Gemma's tokenizer chat template raises `'System role not supported'` if `messages[0].role == 'system'`. `workflows.py` was updated to merge the system prompt into the first user message (`_prepend_system`). This is permanent; Gemma 2/3/4 all share that constraint.
+
+## Manual checklist (post-v1 features)
+
+- [ ] `chat --include`: run `gcp-agent chat --profile heavy --include examples/terraform/service-account-bad-editor.tf`, ask "what's wrong here?", confirm the model identifies `roles/editor` (proves the file content reached the model). Note any size-warning behavior for follow-up calibration.

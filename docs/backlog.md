@@ -20,7 +20,7 @@ For the deferred-hardening register (corporate data handling, audit trail, redac
 - [ ] **`compare` command.** Run two profiles against the same input, emit a side-by-side `outputs/<ts>-comparison.md` (and a metadata header with both model slugs). Most directly tests the brief's thesis (small-vs-large local model behavior).
   - Sub-task: define a second working profile (light) — pick a small text-only mlx_lm-compatible model, e.g. `mlx-community/gemma-3-1b-it-4bit` or `mlx-community/gemma-3n-E4B-it-lm-4bit`, validate it boots, store the slug in `profiles/light.yaml`.
   - Sub-task: serialize: stop heavy server → start light server → run → stop → optional restart heavy. Or: use distinct ports to run both concurrently if RAM allows.
-- [ ] **`chat --include <path>`** flag. Read a file, prepend it (with a clear delimiter) to the first user message of the REPL session. Closes the "I tried to paste a file and it went haywire" gap directly.
+- [x] **`chat --include <path>`** flag. Read a file, prepend it (with a clear delimiter) to the first user message of the REPL session. Closes the "I tried to paste a file and it went haywire" gap directly.
 
 ### priority:medium
 
