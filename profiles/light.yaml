@@ -1,0 +1,12 @@
+name: light
+description: "36 GB MacBook profile for fast local experiments (not exercised in v1)"
+runtime: mlx
+model: TODO-discover-light-slug
+host: 127.0.0.1
+port: 8080
+base_url: http://127.0.0.1:8080/v1
+temperature: 0.3
+max_tokens: 2000
+intended_use:
+  - concept explanation
+  - small Terraform review
