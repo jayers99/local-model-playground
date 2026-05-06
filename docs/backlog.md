@@ -32,7 +32,8 @@ Reference table for the profile work below. RAM tiers are rough working-set esti
 
 - [ ] **`compare` command.** Run two profiles against the same input, emit a side-by-side `outputs/<ts>-comparison.md` (and a metadata header with both model slugs). Most directly tests the brief's thesis (small-vs-large local model behavior). Heavy is `mlx-community/gemma-4-31b-it-4bit` (in use); pair it with a light tier for fast iteration and an x-heavy tier for max-fidelity runs.
   - [x] Sub-task: define a second working profile (light) — `mlx-community/gemma-4-e4b-it-4bit` (~2B "Edge 4B" variant, comfortably fits a 36 GB MacBook), validated boot + single-turn generation 2026-05-05. Note: e4b ships multimodal-shaped weights, so light uses `mlx_vlm.server` (text-only `mlx_lm.server` loads the listener but crashes on first generation).
-  - Sub-task: define an x-heavy profile — `mlx-community/gemma-4-31b-it-8bit` (same 31B model at 8-bit for higher-fidelity local synthesis; gemma-4 tops out at 31B params, so the next tier up is precision, not size). Store in `profiles/x-heavy.yaml`. Expect bigger RAM footprint and slower tokens/sec than heavy.
+  - [x] Sub-task: define an x-heavy profile — `mlx-community/gemma-4-31b-it-8bit` (same 31B model at 8-bit for higher-fidelity local synthesis; gemma-4 tops out at 31B params, so the next tier up is precision, not size). Stored in `profiles/x-heavy.yaml`; validated boot + single-turn generation 2026-05-05.
+  - [x] Sub-task: validate the remaining roster profiles (`wide`, `code`, `arch`) — all booted and generated single-turn replies on 2026-05-05.
   - Sub-task: serialize: stop heavy server → start light server → run → stop → optional restart heavy. Or: use distinct ports to run both concurrently if RAM allows.
 - [x] **`chat --include <path>`** flag. Read a file, prepend it (with a clear delimiter) to the first user message of the REPL session. Closes the "I tried to paste a file and it went haywire" gap directly.
 

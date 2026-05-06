@@ -61,7 +61,7 @@ Key invariants:
 | arch     | GLM-4.5-Air 106B MoE | `mlx_lm.server` | 96–128 GB | architecture / design reasoning |
 | x-heavy  | gemma-4 31B 8-bit | `mlx_vlm.server` | 128 GB (tight) | max-fidelity synthesis  |
 
-Validated end-to-end: heavy, light. Others boot-tested only or unvalidated — confirm before relying on them.
+All six validated end-to-end (boot + single-turn generation) on 2026-05-05. Heavy is the CLI default.
 
 ## Where things live
 
