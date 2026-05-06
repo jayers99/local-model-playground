@@ -224,3 +224,6 @@ outputs/*
 
 # Claude Code local settings
 .claude/
+
+# Personal CLI snippets scratchpad
+snippets.sh
