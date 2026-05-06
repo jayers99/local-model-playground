@@ -13,6 +13,7 @@ class Profile(BaseModel):
     description: str
     runtime: Literal["mlx"]
     model: str
+    server_binary: Literal["mlx_lm.server", "mlx_vlm.server"] = "mlx_lm.server"
     host: str = "127.0.0.1"
     port: int = 8080
     base_url: str

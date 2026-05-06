@@ -16,7 +16,8 @@ Sequence we walked:
 
 1. `mlx-community/gemma-2-27b-it-4bit` — text-only, `mlx_lm`-compatible, but the 4-bit weights are broken: `mlx_lm.generate` produces pure `<pad>` tokens for any prompt (verified by bypassing `mlx_lm.server` entirely). Avoid.
 2. `mlx-community/gemma-2-9b-it-4bit` — smaller fallback we briefly switched to, but never tested live because we found a better Gemma 3 option.
-3. `mlx-community/gemma-3-text-27b-it-4bit` — **the right answer**. Explicit `text-` in the slug means the explicitly text-only sibling of the (multimodal) `gemma-3-27b-it-4bit`. Instruction-tuned, ~16 GB on disk, fits the heavy profile cleanly.
+3. `mlx-community/gemma-3-text-27b-it-4bit` — text-only Gemma 3 27B. Slug pattern `gemma-3-text-Nb-it-Mbit` is the explicit text-only sibling of the multimodal `gemma-3-Nb-it-Mbit`. Works with `mlx_lm.server`. A solid backup choice.
+4. **Final landing: `mlx-community/gemma-4-31b-it-4bit` via `mlx_vlm.server`.** This is the slug from the original brief. It IS multimodal (image-text-to-text), but `mlx_vlm.server` exposes the same `/v1/chat/completions` OpenAI-compatible endpoint and accepts text-only requests fine. Adding a `server_binary` field to `Profile` (defaulting to `mlx_lm.server` for future text-only models, set to `mlx_vlm.server` on heavy) lets us drive both runtimes with the same harness. ~18.4 GB on disk.
 
 Two more text-only Gemma options exist if needed:
 
@@ -25,7 +26,9 @@ Two more text-only Gemma options exist if needed:
 
 Server flags actually exercised:
 
-- `mlx_lm.server --use-default-chat-template` — we added this when chat templates first looked off; turned out the underlying issue was the broken Gemma 2 27B 4-bit quant, not the template. Keeping the flag is harmless but not strictly necessary once a known-good model is in place.
+- `mlx_lm.server --use-default-chat-template` — we briefly added this when chat templates first looked off; turned out the underlying issue was the broken Gemma 2 27B 4-bit quant, not the template. Removed once we landed on `mlx_vlm.server`, which doesn't accept it. Default behavior (use the tokenizer's chat_template) is correct for any properly-quantized Gemma model.
+
+Architectural takeaway: the `LLMClient` is a generic OpenAI SDK pointed at `base_url`, and both `mlx_lm.server` and `mlx_vlm.server` expose `/v1/chat/completions`. So the runtime choice is a pure server-binary swap — a single profile field (`server_binary`), no client code change. Worth remembering when other Apple-Silicon-native servers (e.g. `mlx-openai-server`, `vMLX`, etc.) come up: as long as they speak `/v1/chat/completions`, they slot in.
 
 Workflow change forced by Gemma's chat template:
 

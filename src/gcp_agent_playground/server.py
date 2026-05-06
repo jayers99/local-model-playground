@@ -46,19 +46,18 @@ class MLXServer:
         try:
             self._proc = subprocess.Popen(
                 [
-                    "mlx_lm.server",
+                    self.profile.server_binary,
                     "--model", self.profile.model,
                     "--host", self.profile.host,
                     "--port", str(self.profile.port),
-                    "--use-default-chat-template",
                 ],
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
             )
         except FileNotFoundError as e:
             raise ServerError(
-                "mlx_lm.server not found on PATH. Did you 'uv sync'? "
-                "Try: uv run mlx_lm.server --help"
+                f"{self.profile.server_binary} not found on PATH. Did you 'uv sync'? "
+                f"Try: uv run {self.profile.server_binary} --help"
             ) from e
 
         atexit.register(self.stop)
