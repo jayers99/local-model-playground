@@ -50,6 +50,7 @@ class MLXServer:
                     "--model", self.profile.model,
                     "--host", self.profile.host,
                     "--port", str(self.profile.port),
+                    "--use-default-chat-template",
                 ],
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
