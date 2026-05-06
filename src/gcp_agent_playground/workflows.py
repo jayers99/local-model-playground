@@ -95,13 +95,16 @@ def _load_include_or_exit(include_path: Path | None) -> str | None:
     return body
 
 
-def chat(client: LLMClient) -> None:
+def chat(client: LLMClient, include_path: Path | None = None) -> None:
     """Interactive REPL. Read a user line, stream the assistant reply, repeat.
 
-    'exit' or Ctrl-D to quit.
+    'exit' or Ctrl-D to quit. If include_path is given, the file's content is
+    folded into the first user message with a clear delimiter.
     """
+    include_body = _load_include_or_exit(include_path)
     history: list[dict] = []
     print("gcp-agent chat — Ctrl-D or 'exit' to quit\n")
+    first_turn = True
     while True:
         try:
             user = input("you> ").strip()
@@ -110,7 +113,12 @@ def chat(client: LLMClient) -> None:
             return
         if user.lower() in {"exit", "quit"} or not user:
             return
-        history.append({"role": "user", "content": user})
+        user_msg = (
+            _build_first_user_message(user, include_path, include_body)
+            if first_turn
+            else user
+        )
+        history.append({"role": "user", "content": user_msg})
         print("agent> ", end="", flush=True)
         chunks: list[str] = []
         for chunk in client.stream_chat(_prepend_system(history)):
@@ -119,6 +127,7 @@ def chat(client: LLMClient) -> None:
             chunks.append(chunk)
         print()
         history.append({"role": "assistant", "content": "".join(chunks)})
+        first_turn = False
 
 
 def review(client: LLMClient, input_path: Path) -> Path:

@@ -30,9 +30,20 @@ def _run(profile_name: str, body) -> None:
 
 
 @app.command()
-def chat(profile: str = typer.Option("heavy", "--profile", "-p")) -> None:
+def chat(
+    profile: str = typer.Option("heavy", "--profile", "-p"),
+    include: Path | None = typer.Option(
+        None,
+        "--include",
+        "-i",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Path to a text file to include in the first user message.",
+    ),
+) -> None:
     """Interactive chat with the local model."""
-    _run(profile, lambda client: workflows.chat(client))
+    _run(profile, lambda client: workflows.chat(client, include_path=include))
 
 
 @app.command()
