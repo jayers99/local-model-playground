@@ -46,6 +46,7 @@ def test_human_size_kilobytes() -> None:
     assert _human_size(1024) == "1.0 KB"
     assert _human_size(64 * 1024) == "64.0 KB"
     assert _human_size(int(128.4 * 1024)) == "128.4 KB"
+    assert _human_size(1024 * 1024 - 1) == "1024.0 KB"
 
 
 def test_human_size_megabytes() -> None:
