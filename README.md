@@ -34,14 +34,14 @@ This is a learning POC. Use fake/educational inputs only — see `docs/idea.md` 
 
 Six profiles ship in `profiles/`. All boot + single-turn-generated cleanly on a 128 GB M5 Max as of 2026-05-05. Pick by domain and machine size; see `docs/backlog.md` for the full roster (server binary, parameter counts, cold-start times).
 
-| Profile  | Model                                                | RAM tier       | Best for                                                          |
-| -------- | ---------------------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| light    | `mlx-community/gemma-4-e4b-it-4bit`                  | 16 GB+         | Fast iteration, concept Q&A, small Terraform review               |
-| wide     | `mlx-community/gemma-4-26b-a4b-it-4bit`              | 36–64 GB       | Knowledge-broad MoE — speed of 4B with breadth of 26B             |
-| code     | `mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`    | 36–64 GB       | Code review, scaffolding, refactor advice                         |
-| heavy    | `mlx-community/gemma-4-31b-it-4bit` *(CLI default)*  | 64–128 GB      | Default deep synthesis — Terraform review, GCP reasoning          |
-| arch     | `mlx-community/GLM-4.5-Air-4bit`                     | 96–128 GB      | Architecture / design reasoning — GCP solution shape, trade-offs  |
-| x-heavy  | `mlx-community/gemma-4-31b-it-8bit`                  | 128 GB (tight) | Same 31B as heavy at 8-bit for max-fidelity synthesis             |
+| Profile | Model                                               | RAM tier       | Best for                                                     |
+| ------- | --------------------------------------------------- | -------------- | ------------------------------------------------------------ |
+| light   | `mlx-community/gemma-4-e4b-it-4bit`                 | 16 GB+         | Fast iteration, concept Q&A, small Terraform review          |
+| wide    | `mlx-community/gemma-4-26b-a4b-it-4bit`             | 36–64 GB       | Knowledge-broad MoE — speed of 4B with breadth of 26B        |
+| code    | `mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`  | 36–64 GB       | Code review, scaffolding, refactor advice                    |
+| heavy   | `mlx-community/gemma-4-31b-it-4bit` *(CLI default)* | 64–128 GB      | Default deep synthesis — Terraform review, GCP reasoning     |
+| arch    | `mlx-community/GLM-4.5-Air-4bit`                    | 96–128 GB      | Architecture / design reasoning — GCP solution shape, trade-offs |
+| x-heavy | `mlx-community/gemma-4-31b-it-8bit`                 | 128 GB (tight) | Same 31B as heavy at 8-bit for max-fidelity synthesis        |
 
 Pre-pull any of them with `uv run hf download <slug>`. Profiles share port 8080, so only one runs at a time.
 
